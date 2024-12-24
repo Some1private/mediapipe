@@ -142,16 +142,17 @@ COPY .bazelrc /mediapipe/.bazelrc
 RUN echo "build --disk_cache=$BAZEL_CACHE" >> /mediapipe/.bazelrc && \
     echo "build --repository_cache=$BAZEL_CACHE/repos" >> /mediapipe/.bazelrc && \
     echo "build --experimental_repository_cache_hardlinks" >> /mediapipe/.bazelrc && \
-    echo "build --experimental_guard_against_concurrent_changes" >> /mediapipe/.bazelrc && \
-    echo "build --remote_cache_compression" >> /mediapipe/.bazelrc
+    echo "build --experimental_guard_against_concurrent_changes" >> /mediapipe/.bazelrc
 
 # Build AutoFlip by default
 RUN --mount=type=cache,target=/root/.cache/bazel,id=bazel_cache \
     --mount=type=cache,target=/root/.cache/pip,id=pip_cache \
+    BAZEL_CXXOPTS="-std=c++17" \
     bazel build -c opt \
     --define MEDIAPIPE_DISABLE_GPU=1 \
     --define=XNNPACK_ENABLE_ASSEMBLY=false \
     --define=XNNPACK_X86_FLAGS="-mno-avx512f -mno-avx512cd -mno-avx512er -mno-avx512pf -mno-avx512bw -mno-avx512dq -mno-avx512vl -mno-avx512ifma -mno-avx512vbmi -mno-avxvnni" \
     --copt=-march=x86-64-v2 \
     --copt=-mtune=generic \
+    --keep_going \
     mediapipe/examples/desktop/autoflip:run_autoflip
