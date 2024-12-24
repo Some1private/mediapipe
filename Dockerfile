@@ -154,5 +154,17 @@ RUN --mount=type=cache,target=/root/.cache/bazel,id=bazel_cache \
     --define=XNNPACK_X86_FLAGS="-mno-avx512f -mno-avx512cd -mno-avx512er -mno-avx512pf -mno-avx512bw -mno-avx512dq -mno-avx512vl -mno-avx512ifma -mno-avx512vbmi -mno-avxvnni" \
     --copt=-march=x86-64-v2 \
     --copt=-mtune=generic \
+    --copt=-fvisibility=hidden \
+    --copt=-Wno-sign-compare \
+    --copt=-fno-strict-aliasing \
+    --host_copt=-fPIC \
+    --linkopt=-fPIC \
+    --compilation_mode=opt \
+    --define=use_fast_cpp_protos=true \
+    --define=allow_oversize_protos=true \
+    --define=grpc_no_ares=true \
+    --experimental_repo_remote_exec \
+    --incompatible_enable_cc_toolchain_resolution \
+    --features=-layering_check \
     --keep_going \
-    mediapipe/examples/desktop/autoflip:run_autoflip
+    //mediapipe/examples/desktop/autoflip:run_autoflip
