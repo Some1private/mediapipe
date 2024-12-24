@@ -33,15 +33,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         nodejs \
         npm \
         python3-dev \
-        python3-opencv \
-        python3-pip \
-        libopencv-core-dev \
-        libopencv-highgui-dev \
-        libopencv-imgproc-dev \
-        libopencv-video-dev \
-        libopencv-calib3d-dev \
-        libopencv-features2d-dev \
         software-properties-common && \
+    # Add OpenCV 3.4 repository
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    # Install OpenCV 3.4 and its dependencies
+    apt-get install -y \
+        python3.7 \
+        python3.7-dev \
+        libopencv3.4-dev \
+        libopencv-contrib3.4-dev \
+        python3-opencv=3.4* && \
     apt-get update && apt-get install -y openjdk-8-jdk && \
     apt-get install -y mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev && \
     apt-get install -y mesa-utils && \
@@ -59,7 +61,7 @@ RUN ln -sf /usr/bin/clang-format-16 /usr/bin/clang-format
 RUN pip3 install --upgrade setuptools
 RUN pip3 install wheel
 RUN pip3 install future
-RUN pip3 install absl-py "numpy<2" jax[cpu] opencv-contrib-python protobuf==3.20.1
+RUN pip3 install absl-py "numpy<2" jax[cpu] opencv-python==3.4.17.61 protobuf==3.20.1
 RUN pip3 install six==1.14.0
 RUN pip3 install tensorflow
 RUN pip3 install tf_slim
@@ -78,5 +80,9 @@ azel-${BAZEL_VERSION}-installer-linux-x86_64.sh" && \
 
 COPY . /mediapipe/
 
-# If we want the docker image to contain the pre-built object_detection_offline_demo binary, do the following
-# RUN bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/demo:object_detection_tensorflow_demo
+# Set default build configuration for AutoFlip
+ENV MEDIAPIPE_DISABLE_GPU=1
+
+# Build AutoFlip by default
+RUN bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 \
+    mediapipe/examples/desktop/autoflip:run_autoflip
