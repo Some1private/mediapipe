@@ -27,10 +27,10 @@ jobs:
             /tmp/.buildx-cache
             ~/.cache/bazel
             ~/.cache/pip
-          key: ${{ runner.os }}-buildx-${{ hashFiles('Dockerfile') }}-${{ github.sha }}
+          key: ${{ runner.os }}-docker-${{ hashFiles('Dockerfile') }}
           restore-keys: |
-            ${{ runner.os }}-buildx-${{ hashFiles('Dockerfile') }}-
-            ${{ runner.os }}-buildx-
+            ${{ runner.os }}-docker-
+            ${{ runner.os }}-
 
       - name: Build Docker image
         uses: docker/build-push-action@v5
@@ -38,11 +38,12 @@ jobs:
           context: .
           push: false
           load: true
-          tags: my-image-name:${{ github.sha }}
+          tags: my-image-name:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
           build-args: |
             BUILDKIT_INLINE_CACHE=1
+            DOCKER_BUILDKIT=1
           outputs: type=docker
 
       - name: Move cache
