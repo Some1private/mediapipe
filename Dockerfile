@@ -138,9 +138,15 @@ ENV MEDIAPIPE_DISABLE_GPU=1
 # Build AutoFlip by default
 RUN bazel build -c opt \
     --define MEDIAPIPE_DISABLE_GPU=1 \
-    --copt=-DXNNPACK_AVX512FP16_DISABLE=1 \
-    --copt=-DXNNPACK_AVX512_DISABLE=1 \
-    --copt=-DXNNPACK_MICROKERNEL_OVERRIDE=1 \
-    --copt=-DXNNPACK_ENABLE_ASSEMBLY=0 \
-    --copt=-DXNNPACK_ENABLE_NATIVE=0 \
+    --copt=-march=x86-64 \
+    --copt=-mtune=generic \
+    --copt=-mno-avx512f \
+    --copt=-mno-avx512pf \
+    --copt=-mno-avx512er \
+    --copt=-mno-avx512cd \
+    --copt=-mno-avx512vl \
+    --copt=-mno-avx512bw \
+    --copt=-mno-avx512dq \
+    --copt=-mno-avx512ifma \
+    --copt=-mno-avx512vbmi \
     mediapipe/examples/desktop/autoflip:run_autoflip
