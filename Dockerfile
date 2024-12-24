@@ -148,15 +148,8 @@ RUN echo "build --disk_cache=$BAZEL_CACHE" >> /mediapipe/.bazelrc && \
 RUN --mount=type=cache,target=/root/.cache/bazel \
     bazel build -c opt \
     --define MEDIAPIPE_DISABLE_GPU=1 \
-    --copt=-march=x86-64 \
+    --define=XNNPACK_ENABLE_ASSEMBLY=false \
+    --define=XNNPACK_X86_FLAGS="-mno-avx512f -mno-avx512cd -mno-avx512er -mno-avx512pf -mno-avx512bw -mno-avx512dq -mno-avx512vl -mno-avx512ifma -mno-avx512vbmi -mno-avxvnni" \
+    --copt=-march=x86-64-v2 \
     --copt=-mtune=generic \
-    --copt=-mno-avx512f \
-    --copt=-mno-avx512pf \
-    --copt=-mno-avx512er \
-    --copt=-mno-avx512cd \
-    --copt=-mno-avx512vl \
-    --copt=-mno-avx512bw \
-    --copt=-mno-avx512dq \
-    --copt=-mno-avx512ifma \
-    --copt=-mno-avx512vbmi \
     mediapipe/examples/desktop/autoflip:run_autoflip
