@@ -33,20 +33,60 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         nodejs \
         npm \
         python3-dev \
-        software-properties-common && \
-    # Add OpenCV 3.4 repository
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update && \
-    # Install OpenCV 3.4 and its dependencies
-    apt-get install -y \
-        python3.7 \
-        python3.7-dev \
-        libopencv3.4-dev \
-        libopencv-contrib3.4-dev \
-        python3-opencv=3.4* && \
-    apt-get update && apt-get install -y openjdk-8-jdk && \
-    apt-get install -y mesa-common-dev libegl1-mesa-dev libgles2-mesa-dev && \
-    apt-get install -y mesa-utils && \
+        python3-pip \
+        cmake \
+        pkg-config \
+        libgtk-3-dev \
+        libavcodec-dev \
+        libavformat-dev \
+        libswscale-dev \
+        libv4l-dev \
+        libxvidcore-dev \
+        libx264-dev \
+        libjpeg-dev \
+        libpng-dev \
+        libtiff-dev \
+        gfortran \
+        openexr \
+        libatlas-base-dev \
+        python3-numpy \
+        libtbb2 \
+        libtbb-dev \
+        libdc1394-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install OpenCV 3.4.16
+RUN cd /tmp && \
+    wget -q https://github.com/opencv/opencv/archive/3.4.16.zip && \
+    wget -q https://github.com/opencv/opencv_contrib/archive/3.4.16.zip && \
+    unzip -q 3.4.16.zip && \
+    unzip -q 3.4.16.zip && \
+    mv opencv-3.4.16 opencv && \
+    mv opencv_contrib-3.4.16 opencv_contrib && \
+    mkdir -p opencv/build && \
+    cd opencv/build && \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
+          -D CMAKE_INSTALL_PREFIX=/usr/local \
+          -D INSTALL_PYTHON_EXAMPLES=OFF \
+          -D INSTALL_C_EXAMPLES=OFF \
+          -D OPENCV_ENABLE_NONFREE=ON \
+          -D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib/modules \
+          -D PYTHON_EXECUTABLE=/usr/bin/python3 \
+          -D BUILD_EXAMPLES=OFF .. && \
+    make -j4 && \
+    make install && \
+    ldconfig && \
+    rm -rf /tmp/opencv* && \
+    rm -rf /tmp/3.4.16.zip
+
+# Install additional dependencies
+RUN apt-get update && apt-get install -y \
+        mesa-common-dev \
+        libegl1-mesa-dev \
+        libgles2-mesa-dev \
+        mesa-utils \
+        openjdk-8-jdk && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
