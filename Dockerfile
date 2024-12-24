@@ -135,8 +135,18 @@ COPY . /mediapipe/
 # Set default build configuration for AutoFlip
 ENV MEDIAPIPE_DISABLE_GPU=1
 
+# Configure Bazel cache directory
+ENV BAZEL_CACHE=/root/.cache/bazel
+RUN mkdir -p $BAZEL_CACHE
+
+# Add .bazelrc for caching configuration
+RUN echo "build --disk_cache=$BAZEL_CACHE" >> /mediapipe/.bazelrc && \
+    echo "build --repository_cache=$BAZEL_CACHE/repos" >> /mediapipe/.bazelrc && \
+    echo "test --disk_cache=$BAZEL_CACHE" >> /mediapipe/.bazelrc
+
 # Build AutoFlip by default
-RUN bazel build -c opt \
+RUN --mount=type=cache,target=/root/.cache/bazel \
+    bazel build -c opt \
     --define MEDIAPIPE_DISABLE_GPU=1 \
     --copt=-march=x86-64 \
     --copt=-mtune=generic \
