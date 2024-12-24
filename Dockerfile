@@ -136,5 +136,8 @@ COPY . /mediapipe/
 ENV MEDIAPIPE_DISABLE_GPU=1
 
 # Build AutoFlip by default
-RUN bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 \
+RUN bazel build -c opt \
+    --define MEDIAPIPE_DISABLE_GPU=1 \
+    --copt=-DXNNPACK_AVX512FP16_DISABLE=1 \
+    --copt=-DXNNPACK_AVX512_DISABLE=1 \
     mediapipe/examples/desktop/autoflip:run_autoflip
