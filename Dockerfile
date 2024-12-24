@@ -21,6 +21,7 @@ WORKDIR /mediapipe
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Install base dependencies first
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential \
         gcc g++ \
@@ -36,6 +37,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3-pip \
         cmake \
         pkg-config \
+        lsb-release \
+        software-properties-common \
+        gnupg \
         libgtk-3-dev \
         libavcodec-dev \
         libavformat-dev \
@@ -55,6 +59,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libdc1394-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install LLVM
+RUN wget https://apt.llvm.org/llvm.sh && \
+    chmod +x llvm.sh && \
+    ./llvm.sh 16 && \
+    ln -sf /usr/bin/clang-16 /usr/bin/clang && \
+    ln -sf /usr/bin/clang++-16 /usr/bin/clang++ && \
+    ln -sf /usr/bin/clang-format-16 /usr/bin/clang-format && \
+    rm llvm.sh
 
 # Install OpenCV 3.4.16
 RUN cd /tmp && \
@@ -96,14 +109,6 @@ RUN apt-get update && apt-get install -y \
         openjdk-8-jdk && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-# Install Clang 16
-RUN wget https://apt.llvm.org/llvm.sh
-RUN chmod +x llvm.sh
-RUN ./llvm.sh 16
-RUN ln -sf /usr/bin/clang-16 /usr/bin/clang
-RUN ln -sf /usr/bin/clang++-16 /usr/bin/clang++
-RUN ln -sf /usr/bin/clang-format-16 /usr/bin/clang-format
 
 RUN pip3 install --upgrade setuptools
 RUN pip3 install wheel
