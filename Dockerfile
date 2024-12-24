@@ -58,10 +58,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install OpenCV 3.4.16
 RUN cd /tmp && \
-    wget -q https://github.com/opencv/opencv/archive/3.4.16.zip && \
-    wget -q https://github.com/opencv/opencv_contrib/archive/3.4.16.zip && \
-    unzip -q 3.4.16.zip && \
-    unzip -q 3.4.16.zip && \
+    wget -q https://github.com/opencv/opencv/archive/3.4.16.zip -O opencv.zip && \
+    wget -q https://github.com/opencv/opencv_contrib/archive/3.4.16.zip -O opencv_contrib.zip && \
+    unzip -q opencv.zip && \
+    unzip -q opencv_contrib.zip && \
     mv opencv-3.4.16 opencv && \
     mv opencv_contrib-3.4.16 opencv_contrib && \
     mkdir -p opencv/build && \
@@ -73,12 +73,19 @@ RUN cd /tmp && \
           -D OPENCV_ENABLE_NONFREE=ON \
           -D OPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib/modules \
           -D PYTHON_EXECUTABLE=/usr/bin/python3 \
-          -D BUILD_EXAMPLES=OFF .. && \
-    make -j4 && \
+          -D BUILD_EXAMPLES=OFF \
+          -D PYTHON_DEFAULT_EXECUTABLE=/usr/bin/python3 \
+          -D BUILD_opencv_python3=ON \
+          -D PYTHON3_EXECUTABLE=/usr/bin/python3 \
+          -D PYTHON3_INCLUDE_DIR=/usr/include/python3.10 \
+          -D PYTHON3_PACKAGES_PATH=/usr/lib/python3/dist-packages \
+          .. && \
+    make -j$(nproc) && \
     make install && \
     ldconfig && \
-    rm -rf /tmp/opencv* && \
-    rm -rf /tmp/3.4.16.zip
+    cd /tmp && \
+    rm -rf opencv* && \
+    rm -rf *.zip
 
 # Install additional dependencies
 RUN apt-get update && apt-get install -y \
